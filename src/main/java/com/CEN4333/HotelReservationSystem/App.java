@@ -76,7 +76,7 @@ public class App {
     	
     	System.out.println("Please enter the bed type: ");
     	
-    	String bedType = in.nextLine();
+    	String bedType = in.nextLine(); //
     	
     	System.out.println("Please enter the nightly price: ");
     	

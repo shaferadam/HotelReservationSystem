@@ -44,7 +44,7 @@ public class App {
     	
     	if (choice ==2)
     	{
-    		System.out.println("Please enter the roomID for the room:");
+    		System.out.println("Please enter the room number for the room:");
     		
     		int roomID = in.nextInt();
     		

@@ -83,8 +83,8 @@ public class App {
     	double nightlyPrice = in.nextDouble();
     	
     	addRoom(roomNumber,floor,bedType,nightlyPrice);
-    	
-    	System.out.println("The room has been added.");
+    	 
+    	System.out.println("The room has been added."); 
     	   	
     	
     	mainMenu();   	

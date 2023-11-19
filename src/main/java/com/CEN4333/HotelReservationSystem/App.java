@@ -1,6 +1,8 @@
 package com.CEN4333.HotelReservationSystem;
 
 import java.util.List;
+
+///comment added by Jay for a first commit
 import java.util.Scanner;
 
 import org.hibernate.Query;

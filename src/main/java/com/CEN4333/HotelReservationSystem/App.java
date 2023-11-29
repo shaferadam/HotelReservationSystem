@@ -21,9 +21,7 @@ public class App {
     static ServiceRegistry reg = new ServiceRegistryBuilder().applySettings(con.getProperties()).buildServiceRegistry();
     
     static SessionFactory sf = con.buildSessionFactory(reg);
-                  
-    static Session session = sf.openSession();
-    
+           
     static Scanner in = new Scanner(System.in);
     
 	
@@ -183,37 +181,43 @@ public class App {
     public static void addRoom(int roomNumber,int floor,String bedtype, double nightlyPrice) {
     	Room room1 = new Room();
     	
+    	Session session1 = sf.openSession();
+    	
     	room1.setRoomNumber(roomNumber);
     	room1.setFloor(floor);
     	room1.setBedType(bedtype);
     	room1.setNightlyPrice(nightlyPrice);
                         
-        Transaction tx = session.beginTransaction();
+        Transaction tx = session1.beginTransaction();
         
-        session.save(room1);
+        session1.save(room1);
         
         tx.commit();
     }
         
     public static void addCustomer(String custFirstName, String custLastname, String address, String phoneNumber) {
     	
-    	Customer customer1 = new Customer();
+    	Session session1 = sf.openSession();
     	
+    	Customer customer1 = new Customer();
+    	  	
     	customer1.setCustFirstName(custFirstName);
     	customer1.setCustLastName(custLastname);
     	customer1.setAddress(address);
     	customer1.setPhoneNumber(phoneNumber);
     	                        
-        Transaction tx = session.beginTransaction();
+        Transaction tx = session1.beginTransaction();
         
-        session.save(customer1);
+        session1.save(customer1);
         
         tx.commit();
     }
     
     public static void displayAllRooms() {
     	
-    	Query q = session.createQuery("from Room");
+    	Session session1 = sf.openSession();
+    	
+    	Query q = session1.createQuery("from Room");
     	    	    	
     	List<Room> rooms= q.list();  
     	
@@ -228,13 +232,17 @@ public class App {
     	System.out.println("");
     	}
     	
+    	session1.close();
+    	
     	mainMenu();
     	
     }
         
     public static void displayRoom(int roomNumber) {   
     	
-    	Query q = session.createQuery("from Room where roomNumber =" + roomNumber);
+    	Session session1 = sf.openSession();
+    	
+    	Query q = session1.createQuery("from Room where roomNumber =" + roomNumber);
     	    	    	
     	List<Room> rooms= q.list();    	    	    	
     	
@@ -245,12 +253,12 @@ public class App {
     	System.out.println("Available: " + rooms.get(0).isAvailable());
     	System.out.println("");
     	
+    	session1.close();
+    	
     	mainMenu();
         	    	
     }
-    
-    
-    // This method isn't working.  It says it deletes the record but when you check the database it is still there.
+            
     public static void deleteRoom(int roomNumber) {
     	
     	Session session1 = sf.openSession();
@@ -262,44 +270,44 @@ public class App {
     	// System.out.println(q1.toString());
     	
     	List<Room> rooms = q1.list();  
-    	
-    	System.out.println(rooms.toString());
-    	
-    	int roomID = rooms.get(0).getRoomId();
-    	
-    	System.out.println(roomID);
+    	    	
+    	int roomID = rooms.get(0).getRoomId();    
     	
     	tx1.commit();
+    	
+    	session1.close();
+    	
+    	Session session2 = sf.openSession();
     	
     	
     	try {
     		
-    		Transaction tx2 = session1.beginTransaction();
+    		Transaction tx2 = session2.beginTransaction();
 	    	
-        	// String q2String = "delete Room where roomId=1";
+        	String q2String = "delete Room where roomId=" + roomID;
         	
-        	SQLQuery q2 = session.createSQLQuery("delete from Room where roomId = " + 1);
+        	// SQLQuery q2 = session.createSQLQuery("delete from Room where roomId = " + 1);
         	
-        	// Query q2 = session1.createQuery(q2String);        	
+        	Query q2 = session2.createQuery(q2String);        	
         	    	   	    	
         	int count = q2.executeUpdate();
         	
         	System.out.println(count + " Records Deleted");
         	    	    	
         	tx2.commit();
+        	        	
     		
     	}  catch(Exception e) {e.printStackTrace(); }
     	
     	finally { 
+    		    	
+    		session2.flush();
     		
-    		session1.clear();
+        	session2.close(); 
         	
-        	session1.close(); 
+        	mainMenu();
     		
-    	}      	
-    	    	
-    	mainMenu();
-       			
+    	}          			
     	
     }
        

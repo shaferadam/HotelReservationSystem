@@ -62,7 +62,5 @@ public class Room
 		return "Room [roomId=" + roomId + ", roomNumber=" + roomNumber + ", floor=" + floor + ", bedType=" + bedType
 				+ ", isAvailable=" + isAvailable + ", nightlyPrice=" + nightlyPrice + "]";
 	}
-	
-	
-					
+						
 }

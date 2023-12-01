@@ -50,5 +50,12 @@ public class Customer
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
 	}
+	@Override
+	public String toString() {
+		return "Customer [custId=" + custId + ", custFirstName=" + custFirstName + ", custLastName=" + custLastName
+				+ ", address=" + address + ", phoneNumber=" + phoneNumber + "]";
+	}
+	
+	
 	
 }

@@ -24,7 +24,6 @@ public class App {
            
     static Scanner in = new Scanner(System.in);
     
-	
 	public static void main( String[] args ){
 						
 		mainMenu();  
@@ -68,13 +67,11 @@ public class App {
     			break;
     			
     	case 5:
-    			System.out.println("To do");
-    			mainMenu();
+    			displayCustomerMenu();
     			break;
     		
     	case 6:
-    			System.out.println("To do");
-    			mainMenu();
+    			deleteCustomerMenu();
     			break;
     	
     	default:
@@ -140,7 +137,7 @@ public class App {
     			break;    	   	
     	
     	default:
-    				displayRoom(choice);
+    			displayRoom(choice);
     	}   	  	    	    	    	    	
     	
     	  	    	
@@ -175,9 +172,18 @@ public class App {
     	
     }
     
-   
-    // Methods
+    public static void displayCustomerMenu() {
+    	
+    	in.nextLine();
+    	
+    	System.out.println("Please enter Customer Phone Number to look up customer: ");
+    	
+    	String choice = in.nextLine();
+    	
+    	displayCustomer(choice);
+    }
     
+    // Methods
     public static void addRoom(int roomNumber,int floor,String bedtype, double nightlyPrice) {
     	Room room1 = new Room();
     	
@@ -231,7 +237,6 @@ public class App {
     	System.out.println("Available: " + rooms.get(i).isAvailable());
     	System.out.println("");
     	}
-    	
     	session1.close();
     	
     	mainMenu();
@@ -307,8 +312,92 @@ public class App {
         	
         	mainMenu();
     		
-    	}          			
-    	
+    	}          			  	
     }
-       
-  }
+    // Display Customer
+    public static void displayCustomer(String customerPhoneNumber) {   
+    	
+		Session session1 = sf.openSession();
+	
+		Query q = session1.createQuery("from Customer where phoneNumber =" + customerPhoneNumber);
+	    	    	
+		List<Customer> customers= q.list();    	    	    	
+		
+		System.out.println("");
+		System.out.println("customer Id: " + customers.get(0).getCustId());
+		System.out.println("First Name: " + customers.get(0).getCustFirstName());
+		System.out.println("Last Name: " + customers.get(0).getCustLastName());
+		System.out.println("Phone Number: " + customers.get(0).getPhoneNumber());
+		System.out.println("");
+		
+	
+		session1.close();
+	
+		mainMenu();	    	
+	}
+    
+    public static void deleteCustomerMenu() {
+    	
+    	Scanner scanner = new Scanner(System.in);
+    	
+    	System.out.println("Please enter the customer phone number of customer to be deleted.");
+    	
+    	String custPhoneNumber = scanner.nextLine();
+    	
+    	deleteCustomer(custPhoneNumber);
+    	
+    	System.out.println("Customer with phone number " + custPhoneNumber + " has been deleted.");
+    	   	    	    	
+    }
+    
+    public static void deleteCustomer(String custPhoneNumber) {
+    	
+    	Session session1 = sf.openSession();
+    	
+    	Transaction tx1 = session1.beginTransaction();
+    	
+    	Query q1 = session1.createQuery("from Customer where phoneNumber =" + custPhoneNumber);
+    	
+    	// System.out.println(q1.toString());
+    	
+    	List<Customer> customers = q1.list();  
+    	    	
+    	String phoneNumber = customers.get(0).getPhoneNumber();    
+    	
+    	tx1.commit();
+    	
+    	session1.close();
+    	
+    	Session session2 = sf.openSession();
+    	
+    	
+    	try {
+    		
+    		Transaction tx2 = session2.beginTransaction();
+	    	
+        	String q2String = "delete Customer where phoneNumber=" + phoneNumber;
+        	
+        	// SQLQuery q2 = session.createSQLQuery("delete from Room where roomId = " + 1);
+        	
+        	Query q2 = session2.createQuery(q2String);        	
+        	    	   	    	
+        	int count = q2.executeUpdate();
+        	
+        	System.out.println(count + " Records Deleted");
+        	    	    	
+        	tx2.commit();
+        	        	
+    		
+    	}  catch(Exception e) {e.printStackTrace(); }
+    	
+    	finally { 
+    		    	
+    		session2.flush();
+    		
+        	session2.close(); 
+        	
+        	mainMenu();
+    		
+    	}          			  	
+    }
+}

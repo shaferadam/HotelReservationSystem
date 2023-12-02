@@ -16,7 +16,8 @@ public class App {
 	
 	static Configuration con = new Configuration().configure()
 			.addAnnotatedClass(Room.class)
-			.addAnnotatedClass(Customer.class);
+			.addAnnotatedClass(Customer.class)
+			.addAnnotatedClass(Reservation.class);
     
     static ServiceRegistry reg = new ServiceRegistryBuilder().applySettings(con.getProperties()).buildServiceRegistry();
     
@@ -24,13 +25,13 @@ public class App {
            
     static Scanner in = new Scanner(System.in);
     
-	public static void main( String[] args ){
-						
-		mainMenu();  
-        	
-    }			
     
-   
+	public static void main( String[] args ){
+					
+		mainMenu();        	
+    }			
+       
+	
 	// Menus
 	
 	public static void mainMenu() {
@@ -43,6 +44,7 @@ public class App {
     	System.out.println("4.) Add customer");
     	System.out.println("5.) Display customer");
     	System.out.println("6.) Delete customer");
+    	System.out.println("7.) Add reservation");
     	    	    	
     	int choice = in.nextInt();
     	
@@ -73,6 +75,10 @@ public class App {
     	case 6:
     			deleteCustomerMenu();
     			break;
+    			
+    	case 7:
+			addReservationMenu();
+			break;
     	
     	default:
     				mainMenu();
@@ -172,6 +178,36 @@ public class App {
     	
     }
     
+    public static void addReservationMenu() {
+    	
+    	in.nextLine();
+    	
+    	System.out.println("Please enter the customer's telephone number: ");
+    	
+    	String custPhoneNumber = in.nextLine();
+    	  	    	    	    	    	
+    	System.out.println("Please enter the room number:");
+    	
+    	int roomNumber = in.nextInt();
+    	
+    	in.nextLine();
+    	
+    	System.out.println("Please enter the reservation start date: ");
+    	
+    	String startDate = in.nextLine(); 
+    	
+    	System.out.println("Please enter the reservation end date: ");
+    	    	    	
+    	String endDate= in.nextLine(); 
+    	
+    	addReservation(custPhoneNumber, roomNumber, startDate, endDate);
+    	 
+    	System.out.println("The reservation has been added."); 
+    	  	    	
+    	mainMenu();   	
+    	
+    }
+    
     public static void displayCustomerMenu() {
     	
     	in.nextLine();
@@ -183,6 +219,7 @@ public class App {
     	displayCustomer(choice);
     }
     
+   
     // Methods
     public static void addRoom(int roomNumber,int floor,String bedtype, double nightlyPrice) {
     	Room room1 = new Room();
@@ -218,7 +255,49 @@ public class App {
         
         tx.commit();
     }
-    
+       
+    public static void addReservation(String customerPhoneNumber, int roomNumber, String startDate, String endDate){
+    	
+    	Session session1 = sf.openSession();
+    	
+		Query q1 = session1.createQuery("from Customer where phoneNumber = '" + customerPhoneNumber + "'");
+	    	    	
+		List<Customer> customers= q1.list();
+		
+		int custId = customers.get(0).getCustId();
+			
+		session1.close();
+		
+		
+		Session session2 = sf.openSession();
+    	
+		Query q2 = session2.createQuery("from Room where roomNumber = '" + roomNumber + "'");
+	    	    	
+		List<Room> rooms = q2.list();
+		
+		int roomId = rooms.get(0).getRoomId();
+			
+		session2.close();
+		
+		
+		Session session3 = sf.openSession();
+    	
+    	Reservation reservation1 = new Reservation();
+    	    	   	
+    	reservation1.setCustomerId(custId);
+    	reservation1.setRoomId(roomId);
+    	reservation1.setStartDate(startDate);
+    	reservation1.setEndDate(endDate);
+    	                        
+        Transaction tx = session3.beginTransaction();
+        
+        session3.save(reservation1);
+        
+        tx.commit();
+	
+		mainMenu();	    	
+	}
+      
     public static void displayAllRooms() {
     	
     	Session session1 = sf.openSession();
@@ -290,9 +369,7 @@ public class App {
     		Transaction tx2 = session2.beginTransaction();
 	    	
         	String q2String = "delete Room where roomId=" + roomID;
-        	
-        	// SQLQuery q2 = session.createSQLQuery("delete from Room where roomId = " + 1);
-        	
+        	        	
         	Query q2 = session2.createQuery(q2String);        	
         	    	   	    	
         	int count = q2.executeUpdate();
@@ -314,14 +391,16 @@ public class App {
     		
     	}          			  	
     }
-    // Display Customer
+       
     public static void displayCustomer(String customerPhoneNumber) {   
     	
 		Session session1 = sf.openSession();
 	
-		Query q = session1.createQuery("from Customer where phoneNumber =" + customerPhoneNumber);
+		Query q = session1.createQuery("from Customer where phoneNumber = '" + customerPhoneNumber + "'");
 	    	    	
-		List<Customer> customers= q.list();    	    	    	
+		List<Customer> customers= q.list();  
+		
+		System.out.println(customers.toString());
 		
 		System.out.println("");
 		System.out.println("customer Id: " + customers.get(0).getCustId());
@@ -357,9 +436,7 @@ public class App {
     	Transaction tx1 = session1.beginTransaction();
     	
     	Query q1 = session1.createQuery("from Customer where phoneNumber =" + custPhoneNumber);
-    	
-    	// System.out.println(q1.toString());
-    	
+    	    	    	
     	List<Customer> customers = q1.list();  
     	    	
     	String phoneNumber = customers.get(0).getPhoneNumber();    
@@ -376,9 +453,7 @@ public class App {
     		Transaction tx2 = session2.beginTransaction();
 	    	
         	String q2String = "delete Customer where phoneNumber=" + phoneNumber;
-        	
-        	// SQLQuery q2 = session.createSQLQuery("delete from Room where roomId = " + 1);
-        	
+        	        	
         	Query q2 = session2.createQuery(q2String);        	
         	    	   	    	
         	int count = q2.executeUpdate();

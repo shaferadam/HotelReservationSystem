@@ -28,7 +28,9 @@ public class App {
     
 	public static void main( String[] args ){
 					
-		mainMenu();        	
+		mainMenu();   
+		
+		
     }			
        
 	
@@ -45,6 +47,7 @@ public class App {
     	System.out.println("5.) Display customer");
     	System.out.println("6.) Delete customer");
     	System.out.println("7.) Add reservation");
+    	System.out.println("8.) View Reservation");
     	    	    	
     	int choice = in.nextInt();
     	
@@ -78,6 +81,10 @@ public class App {
     			
     	case 7:
 			addReservationMenu();
+			break;
+			
+    	case 8:
+			displayReservationMenu();
 			break;
     	
     	default:
@@ -343,6 +350,20 @@ public class App {
         	    	
     }
             
+    public static void displayReservationMenu()
+    {
+    	in.nextLine();
+    	
+    	System.out.println("Please enter the reservation ID:");
+    	
+    	int choice = in.nextInt();
+    	
+    	displayReservation(choice);    	    	    	
+    	
+    	  	    	
+    	mainMenu();   
+    }
+    
     public static void deleteRoom(int roomNumber) {
     	
     	Session session1 = sf.openSession();
@@ -472,7 +493,35 @@ public class App {
         	session2.close(); 
         	
         	mainMenu();
+    	}
+    	
+    }
+        	
+    	public static void displayReservation(int reservationID) {
+        	
+      
+        	
+    	  	Session session3= sf.openSession();
+
+        		Query q = session3.createQuery("from Reservation where reservationID= '" + reservationID+ "'");
+        		    	    	
+        		List<Reservation> reservations = q.list();  
+        			
+        		System.out.println(reservations.toString());
+        		
+        		System.out.println("");
+        		System.out.println("roomId: " + reservations.get(0).getRoomId());
+        		System.out.println("Customerid: " + reservations.get(0).getCustomerId());
+        		System.out.println("Start Date: " + reservations.get(0).getStartDate());
+        		System.out.println("End Date: " + reservations.get(0).getEndDate());
+        		System.out.println("");
+        			
+
+        			session3.close();
+
+        			mainMenu();	    	
+        			
     		
     	}          			  	
-    }
-}
+  }
+

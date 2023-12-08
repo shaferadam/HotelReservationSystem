@@ -25,15 +25,12 @@ public class App {
            
     static Scanner in = new Scanner(System.in);
     
-    
 	public static void main( String[] args ){
 					
 		mainMenu();   
 		
-		
     }			
        
-	
 	// Menus
 	
 	public static void mainMenu() {
@@ -42,12 +39,12 @@ public class App {
     	System.out.println("1.) Add room");
     	System.out.println("2.) Display room");
     	System.out.println("3.) Delete room");
-    	
     	System.out.println("4.) Add customer");
     	System.out.println("5.) Display customer");
     	System.out.println("6.) Delete customer");
     	System.out.println("7.) Add reservation");
     	System.out.println("8.) View Reservation");
+    	System.out.println("9.) Delete Reservation");
     	    	    	
     	int choice = in.nextInt();
     	
@@ -86,7 +83,9 @@ public class App {
     	case 8:
 			displayReservationMenu();
 			break;
-    	
+    	case 9:
+    		deleteReservationMenu() ;
+			break;
     	default:
     				mainMenu();
     	}
@@ -456,7 +455,7 @@ public class App {
     	
     	Transaction tx1 = session1.beginTransaction();
     	
-    	Query q1 = session1.createQuery("from Customer where phoneNumber =" + custPhoneNumber);
+    	Query q1 = session1.createQuery("from Customer where phoneNumber = '" + custPhoneNumber + "'");
     	    	    	
     	List<Customer> customers = q1.list();  
     	    	
@@ -473,7 +472,7 @@ public class App {
     		
     		Transaction tx2 = session2.beginTransaction();
 	    	
-        	String q2String = "delete Customer where phoneNumber=" + phoneNumber;
+        	String q2String = "delete Customer where phoneNumber= '" + custPhoneNumber + "'";
         	        	
         	Query q2 = session2.createQuery(q2String);        	
         	    	   	    	
@@ -483,7 +482,6 @@ public class App {
         	    	    	
         	tx2.commit();
         	        	
-    		
     	}  catch(Exception e) {e.printStackTrace(); }
     	
     	finally { 
@@ -519,9 +517,71 @@ public class App {
 
         			session3.close();
 
-        			mainMenu();	    	
-        			
-    		
-    	}          			  	
+        			mainMenu();		
+    	}
+    	//
+    	
+    	 public static void deleteReservationMenu() {
+    	    	
+    	    	Scanner scanner = new Scanner(System.in);
+    	    	
+    	    	System.out.println("Please enter the reservation number of reservation to be deleted.");
+    	    	
+    	    	int resNo = scanner.nextInt();
+    	    	
+    	    	deleteReservation(resNo);
+    	    	
+    	    	System.out.println( "reservation number" + resNo + " has been deleted.");
+    	    	   	    	    	
+    	    }
+    	 
+    	public static void deleteReservation(int resNo) {
+        	
+        	Session session1 = sf.openSession();
+        	
+        	Transaction tx1 = session1.beginTransaction();
+        	
+        	Query q1 = session1.createQuery("from Reservation where reservationID= '" + resNo+ "'");
+        	
+        	List<Reservation> reservations = q1.list();  
+        	    	
+        	int ReservationID = reservations.get(0).getReservationId();    
+        	
+        	tx1.commit();
+        	
+        	session1.close();
+        	
+        	Session session2 = sf.openSession();
+        	
+        	
+        	try {
+        		
+        		Transaction tx2 = session2.beginTransaction();
+    	    	
+            	String q2String = "delete Reservation where reservationID=" + ReservationID;
+            	        	
+            	Query q2 = session2.createQuery(q2String);        	
+            	    	   	    	
+            	int count = q2.executeUpdate();
+            	
+            	System.out.println(count + " Records Deleted");
+            	    	    	
+            	tx2.commit();
+            	        	
+        		
+        	}  catch(Exception e) {e.printStackTrace(); }
+        	
+        	finally { 
+        		    	
+        		session2.flush();
+        		
+            	session2.close(); 
+            	
+            	mainMenu();
+        		
+        	}          			  	
+        }
+    	//
+    	
   }
 
